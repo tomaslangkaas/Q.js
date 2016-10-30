@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8">
+    <title>Q.js</title>
+    <style>
+button{
+  width: 4em;
+}
+body, button{
+  font-family: sans-serif;
+}
+    </style>
+  </head>
+  <body>
+<button id="btnRun" onclick="taskrunner.run()">Run</button
+  ><button id="btnPause" onclick="taskrunner.pause()">Pause</button
+    ><button id="btnReset" onclick="taskrunner.reset()">Reset</button>
+<div id="qdiv"></div>
+  <script src="Q.min.js"></script>
+  <script>
+var taskrunner = Q(
+  function(state) { //onStateChange(state)
+    document.getElementById('btnRun').disabled = (state == 'end' || state == 'run');
+    document.getElementById('btnPause').disabled = (state != 'run');
+    document.getElementById('btnReset').disabled = (state == 'reset');
+    if (state != 'run') {
+      document.getElementById('qdiv').innerHTML = {
+        reset: 'ready',
+        pause: 'paused',
+        end: 'complete'
+      }[state];
+    }
+  },
+  function(id, msg) { //onTaskComplete(taskID, taskMsg)
+    document.getElementById('qdiv').innerHTML = id + ': ' + (msg || 'complete');
+  },
+  function(id, fraction) { //onTaskProgress(taskID, taskMsg)
+    document.getElementById('qdiv').innerHTML = id + ': ' + ((100 * fraction) | 0) + '%';
+  }
+);
+
+taskrunner.task('count to a million', function() { //onSetup
+  var i = 0;
+  return function(onComplete, onProgress) {
+    var j;
+    for (j = 0; i < 1e6 && j < 12345; j++) {
+      i++;
+    }
+    if (i == 1e6) {
+      onComplete();
+    } else {
+      onProgress(i / 1e6)
+    }
+  }
+});
+
+taskrunner.task('count to two million', function() { //onSetup
+  var i = 0;
+  return function(onComplete, onProgress) {
+    var j;
+    for (j = 0; i < 2e6 && j < 5432; j++) {
+      i++;
+    }
+    if (i == 2e6) {
+      onComplete();
+    } else {
+      onProgress(i / 2e6)
+    }
+  }
+});  
+  </script>
+  </body>
+  </html>
