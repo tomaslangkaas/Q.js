@@ -1,3 +1,9 @@
+/*
+  https://github.com/tomaslangkaas/Q.js
+  MIT licensed
+  2016 (c) Tomas Langkaas
+*/
+
 function Q(onStateChange, onTaskComplete, onTaskProgress) {
   var tasks = [],
     ids = [],
