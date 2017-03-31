@@ -8,7 +8,8 @@ function Q(onStateChange, onTaskComplete, onTaskProgress) {
   var tasks = [],
     ids = [],
     index = 0,
-    processID, fn;
+    running = 0,
+    fn;
 
   function handleComplete(msg) {
     onTaskComplete(ids[index], msg);
@@ -18,29 +19,33 @@ function Q(onStateChange, onTaskComplete, onTaskProgress) {
       onStateChange('end');
     } else {
       fn = tasks[index]();
+      setTimeout(runner);
     }
   }
 
   function handleProgress(msg) {
     onTaskProgress(ids[index], msg);
+    setTimeout(runner);
   }
 
   function runner() {
-    fn(handleComplete, handleProgress);
+    if(running){
+      fn(handleComplete, handleProgress);
+    }
   }
 
   function pause() {
-    if (processID) {
-      clearInterval(processID);
-      processID = 0;
+    if (running) {
+      running = 0;
       onStateChange('pause');
     }
   }
 
   return {
     'run': function() {
-      if (!processID) {
-        processID = setInterval(runner, 1); //1 ms required for old IE
+      if (!running) {
+        running = 1;
+        runner();
         onStateChange('run');
       }
     },
